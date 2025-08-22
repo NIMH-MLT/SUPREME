@@ -58,6 +58,20 @@ following line:
 python -m scoop flanker_SUPREME.py [filename].csv
 ```
 
+Docker
+------
+
+1. Set up [Nvidia Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+2. build the container:
+`docker build . -t flanker`
+3. run the model from within the container:
+```
+docker run -it --rm -v .:/flanker --cpus="64" --runtime=nvidia --gpus all flanker
+cd flanker
+conda run -n supreme_env python -m scoop flanker_SUPRME.py sample_flanker.csv
+```
+
+
 Citation
 --------
 
