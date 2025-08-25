@@ -68,7 +68,7 @@ Docker
 ```
 docker run -it --rm -v .:/flanker --cpus="64" --runtime=nvidia --gpus all flanker
 cd flanker
-conda run -n supreme_env python -m scoop flanker_SUPRME.py sample_flanker.csv
+conda run -n supreme_env --no-capture-output python -m scoop flanker_SUPRME.py sample_flanker.csv
 ```
 
 

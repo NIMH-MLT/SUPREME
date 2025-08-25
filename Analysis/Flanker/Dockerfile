@@ -37,4 +37,5 @@ RUN wget https://files.pythonhosted.org/packages/58/33/cced4891eddd1a3ac561ff990
     && make \
     && make install
 
+ENV CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
