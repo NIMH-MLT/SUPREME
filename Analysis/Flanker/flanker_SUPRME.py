@@ -96,7 +96,7 @@ def eval_fun(pop, *args):
                                  [pnames]*len(pop), [bdat]*len(pop)))
     else:
         # use joblib
-        likes = Parallel(n_jobs=1)(delayed(eval_mod)(indiv, pnames, bdat)
+        likes = Parallel(n_jobs=20)(delayed(eval_mod)(indiv, pnames, bdat)
                                   for indiv in pop)
     return np.array(likes)
 
@@ -174,10 +174,13 @@ if __name__=="__main__":
             verbose=True)
 
     out_file = 'flanker_'+s[:-4]+'.tgz'
-
+    print "Burn In"
     for mm in range(16):
         mod(25, burnin=True, migration_prob=0.0)
         save_results(out_file, mod)
+        print "Burn In: " + str(mm)
+    print "Sampling"
     for mm in range(64):
         mod(25, burnin=False, migration_prob=0.0)
         save_results(out_file, mod)
+        print "Sampleing: " + str(mm)

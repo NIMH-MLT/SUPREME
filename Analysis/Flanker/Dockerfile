@@ -18,7 +18,7 @@ RUN wget  https://github.com/conda-forge/miniforge/releases/latest/download/Mini
 ENV PATH="/usr/local/cuda-9.1/bin:/opt/conda/bin:${PATH}"
 
 RUN conda config --set auto_activate_base false \
-    && conda create -c rmg -n supreme_env scoop python=2.7 numpy=1.16 pandas=0.22 joblib=0.13 pip=18 \
+    && conda create -c rmg -n supreme_env python=2.7 scoop numpy=1.16 pandas=0.22 joblib=0.13 pip=18 \
     && conda info -e
 
 SHELL ["conda", "run", "-n", "supreme_env", "/bin/bash", "-c"]    
@@ -38,4 +38,8 @@ RUN wget https://files.pythonhosted.org/packages/58/33/cced4891eddd1a3ac561ff990
     && make install
 
 ENV CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+
+COPY . /Flanker
+WORKDIR /Flanker
+ENTRYPOINT ["/opt/conda/bin/conda", "run", "-n", "supreme_env", "--no-capture-output", "python", "./flanker_SUPRME.py"]
 
