@@ -18,13 +18,13 @@ RUN wget  https://github.com/conda-forge/miniforge/releases/latest/download/Mini
 ENV PATH="/usr/local/cuda-9.1/bin:/opt/conda/bin:${PATH}"
 
 RUN conda config --set auto_activate_base false \
-    && conda create -c rmg -n supreme_env python=2.7 scoop numpy=1.16 pandas=0.22 joblib=0.13 pip=18 \
+    && conda create -c rmg -n supreme_env python=2.7 scoop numpy=1.16 pandas=0.22 joblib=0.13 pip=18 jupyter notebook\
     && conda info -e
 
 SHELL ["conda", "run", "-n", "supreme_env", "/bin/bash", "-c"]    
 
 RUN pip install --upgrade "pip < 21.0" \
-    && pip install mako==1.0.7 pytools==2018.1 pytest==3.4.2 decorator==4.2.1 appdirs==1.4.3 setuptools==38.6.1 scipy==1.01 matplotlib==2.2.2 \
+    && pip install mako==1.0.7 pytools==2018.1 pytest==3.4.2 decorator==4.2.1 appdirs==1.4.3 setuptools==38.6.1 scipy==1.01 matplotlib==2.2.2\
     && git clone https://github.com/compmem/RunDEMC.git \
     && cd RunDEMC \
     && git checkout f2d07db \
