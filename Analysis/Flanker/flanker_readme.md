@@ -71,6 +71,11 @@ cd flanker
 conda run -n supreme_env --no-capture-output python -m scoop flanker_SUPRME.py sample_flanker.csv
 ```
 
+Aternatively, to run a jupyter notebook server in the container:
+```
+docker run -it --rm -v ~/cogmood:/cogmood --cpus="64" --runtime=nvidia --gpus 1 -p 20202:20202 --entrypoint /bin/bash flanker
+conda run -n supreme_env --no-capture-output jupyter notebook --port=20202 --ip=0.0.0.0 --no-browser --allow-root
+```
 
 Citation
 --------
