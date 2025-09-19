@@ -10,6 +10,13 @@ from scipy import stats
 from RunDEMC import Model, Param, dists
 from RunDEMC import Hierarchy, HyperPrior
 from RunDEMC import save_results
+from joblib import Parallel, delayed
+try:
+    import scoop
+    from scoop import futures
+except ImportError:
+    print("Error loading scoop, reverting to joblib.")
+    scoop = None
 import log as lg
 
 from bigtcm import bigTCM
@@ -68,8 +75,14 @@ def eval_fun(pop, *args):
     # call each particle in parallel
     bdat = args[1]
     pnames = args[2]
-    likes = list(futures.map(eval_mod, [indiv for indiv in pop],
+    if scoop and scoop.IS_RUNNING:
+
+        likes = list(futures.map(eval_mod, [indiv for indiv in pop],
                              [pnames]*len(pop), [bdat]*len(pop)))
+    else:
+        # use joblib
+        likes = Parallel(n_jobs=64)(delayed(eval_mod)(indiv, pnames, bdat)
+                                  for indiv in pop)
 
     return np.array(likes)
 
