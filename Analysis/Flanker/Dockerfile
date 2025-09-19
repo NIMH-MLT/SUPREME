@@ -24,7 +24,7 @@ RUN conda config --set auto_activate_base false \
 SHELL ["conda", "run", "-n", "supreme_env", "/bin/bash", "-c"]    
 
 RUN pip install --upgrade "pip < 21.0" \
-    && pip install mako==1.0.7 pytools==2018.1 pytest==3.4.2 decorator==4.2.1 appdirs==1.4.3 setuptools==38.6.1 scipy==1.01 matplotlib==2.2.2\
+    && pip install mako==1.0.7 pytools==2018.1 pytest==3.4.2 decorator==4.2.1 appdirs==1.4.3 setuptools==38.6.1 scipy==1.01 matplotlib==2.2.2 seaborn==0.8.1 \
     && git clone https://github.com/compmem/RunDEMC.git \
     && cd RunDEMC \
     && git checkout f2d07db \
