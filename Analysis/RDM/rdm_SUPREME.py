@@ -4,9 +4,14 @@ from RunDEMC import Model, Param, dists
 from RunDEMC.density import kdensity
 from RunDEMC.io import save_results
 import simulate_lca_model as un
-import scoop
-from scoop import futures
-        
+from joblib import Parallel, delayed
+try:
+    import scoop
+    from scoop import futures
+except ImportError:
+    print("Error loading scoop, reverting to joblib.")
+    scoop = None
+
 # set up the simulation
 nsims = 50000
 nbins = 2000
@@ -36,9 +41,9 @@ def eval_mod_lca(params, param_names, subj_num=None):
     log_like = 0.0
 
     if subj_num:
-        subj_ind = data['subj'] == subj_num
+        subj_ind = data['sub_id'] == subj_num
     else:
-        subj_ind = data['subj'] != None
+        subj_ind = data['sub_id'] != None
 
     # double for-loop iterates through all possible conditions
     for j in range(ncohs):
@@ -50,7 +55,7 @@ def eval_mod_lca(params, param_names, subj_num=None):
             # transform into rhos via sigmoid function
             rho1 = d + (p['a']-d)/(1.+np.exp(-(tf_lc-p['b'])*p['c']))
             rho2 = d + (p['a']-d)/(1.+np.exp(-(tf_rc-p['b'])*p['c']))
-            rts, choices = un.uber_sim(rho=(np.array([rho1, rho2])),
+            rts, choices = un.uber_multi_sim(rho=(np.array([rho1, rho2])),
                                        kappa=p['kappa'], beta=p['beta'],
                                        alpha=p['alpha'], dt=0.01, tau=0.1,
                                        eta=1.0, max_time=3.0,
@@ -70,7 +75,6 @@ def eval_mod_lca(params, param_names, subj_num=None):
             rts_for_right = np.array(data[subj_ind &
                                             (data['coherence'] == coh_index) &
                                             (data['correct']==True)]['rt'])
-
             # check if there are any behavioral responses for that choice
             if ((len(rts_for_left) > 0) and
                 ((len(rt1) < 3) or (np.std(rt1) < 0.001))) or \
@@ -98,14 +102,20 @@ def eval_mod_lca(params, param_names, subj_num=None):
                                       kernel='epanechnikov')
                     pp *= float(len(rt2))/nsims
                     log_like += np.log(pp).sum()
-            
-        
+
+
     return log_like
 
 
 def eval_fun_lca(pop, *args):
-    likes = list(futures.map(eval_mod_lca, [indiv for indiv in pop], [pnames]*len(pop),
+    if scoop and scoop.IS_RUNNING:
+        likes = list(futures.map(eval_mod_lca, [indiv for indiv in pop], [pnames]*len(pop),
                              [args[0]]*len(pop)))
+    else:
+        likes = Parallel(n_jobs=30)(delayed(eval_mod_lca)(indiv, pnames, args[0]) for indiv in pop)
+        #likes = []
+        #for indiv in pop:
+        #    likes.append(eval_mod_lca(indiv, pnames, args[0]))
     return np.array(likes)
 
 if __name__ == "__main__":
@@ -116,12 +126,19 @@ if __name__ == "__main__":
     args = parser.parse_args()
     s = args.datafile
     data = pd.read_csv(s)
+    if not 'sub_id' in data.columns:
+        sub_id = s.split('.')[0].split('-')[-1]
+        try:
+            foo = int(sub_id)
+        except ValueError:
+            sub_id = '0'
+        data['sub_id'] = sub_id
     print("Fitting model to %s"%s)
-    
+
     # remove response times faster than 0.2 seconds
     data = data[data['rt']>0.2]
     data = data.reset_index()
-    
+
     # create the coherence column
     data['coherence'] = ''
     for i in range(len(data)):
@@ -132,8 +149,8 @@ if __name__ == "__main__":
         elif right_coherence>=left_coherence:
             data.at[i, 'coherence'] = str(left_coherence)+', '+str(right_coherence)
     # loop through each participant
-    for s in data.subj.unique():
-        subj_ind = data['subj'] == s
+    for s in data.sub_id.unique():
+        subj_ind = data['sub_id'] == s
         min_rt = data[subj_ind]['rt'].min()
 
         # set up the params
