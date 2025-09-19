@@ -59,7 +59,7 @@ Docker
 `docker build . -t flanker`
 2. run the model from within the container for the sample data:
 ```
-docker run -it --rm -v .:/cab --cpus="64" --runtime=nvidia --gpus all cab /cab/sample_cab.csv 
+docker run -it --rm -v .:/cab --cpus="64" cab /cab/sample_cab.csv 
 ```
 
 Citation
