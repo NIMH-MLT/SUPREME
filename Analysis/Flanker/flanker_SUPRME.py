@@ -4,6 +4,8 @@ from RunDEMC import Model, Param, dists
 from RunDEMC import Hierarchy, HyperPrior
 from RunDEMC.io import save_results, load_results
 from joblib import Parallel, delayed
+import pandas as pd
+import flanker_score_and_map as fsm
 try:
     import scoop
     from scoop import futures
@@ -107,6 +109,7 @@ if __name__=="__main__":
                         help="session identifier")
     args = parser.parse_args()
     s = args.datafile
+    subject = s.replace('flanker_', '').replace('flkr_', '').replace('.csv','')
     dat = pd.read_csv(s)
     print("Fitting model to %s"%s)
 
@@ -173,7 +176,7 @@ if __name__=="__main__":
             purify_every=5,
             verbose=True)
 
-    out_file = 'flanker_'+s[:-4]+'.tgz'
+    out_file = 'flkr_res_' + subject + '.tgz'
     print "Burn In"
     for mm in range(16):
         mod(25, burnin=True, migration_prob=0.0)
@@ -184,3 +187,14 @@ if __name__=="__main__":
         mod(25, burnin=False, migration_prob=0.0)
         save_results(out_file, mod)
         print "Sampleing: " + str(mm)
+        
+    # simulate map params and score
+    burnin=400
+    res = load_results(out_file)
+    params = fsm._get_best_params(res, burnin)
+    map_res, sim_rts, sim_corrects = fsm._run_map_sims(res, subject, burnin)
+    flkr_score = fsm.FlkrScorer(max_rt=1.863647, min_rt=0.528287, include_parts=True)
+    scores = fsm._score_wrapper(subject, ddat, conditions + ['total'], sim_rts, sim_corrects, flkr_score=flkr_score)
+    scores.update(params)
+    scores = pd.DataFrame(scores, index=[0]).set_index('sub_id').reset_index()
+    scores.to_csv('flanker_map' + subject + '.csv')
