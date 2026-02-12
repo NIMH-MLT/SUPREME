@@ -109,7 +109,7 @@ if __name__=="__main__":
                         help="session identifier")
     args = parser.parse_args()
     s = args.datafile
-    subject = s.replace('flanker_', '').replace('flkr_', '').replace('.csv','')
+    subject = s.replace('flanker_', '').replace('flkr-', '').replace('.csv','')
     dat = pd.read_csv(s)
     print("Fitting model to %s"%s)
 
