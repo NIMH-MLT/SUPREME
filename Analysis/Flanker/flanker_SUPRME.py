@@ -197,4 +197,4 @@ if __name__=="__main__":
     scores = fsm._score_wrapper(subject, ddat, conditions + ['total'], sim_rts, sim_corrects, flkr_score=flkr_score)
     scores.update(params)
     scores = pd.DataFrame(scores, index=[0]).set_index('sub_id').reset_index()
-    scores.to_csv('flanker_map' + subject + '.csv')
+    scores.to_csv('flkr_map' + subject + '.csv')
