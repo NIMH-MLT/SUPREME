@@ -187,9 +187,10 @@ if __name__=="__main__":
         mod(25, burnin=False, migration_prob=0.0)
         save_results(out_file, mod)
         print "Sampleing: " + str(mm)
-        
+
     # simulate map params and score
     burnin=400
+    conditions = ['+', '=', '~']
     res = load_results(out_file)
     params = fsm._get_best_params(res, burnin)
     map_res, sim_rts, sim_corrects = fsm._run_map_sims(res, subject, burnin)
@@ -197,4 +198,4 @@ if __name__=="__main__":
     scores = fsm._score_wrapper(subject, ddat, conditions + ['total'], sim_rts, sim_corrects, flkr_score=flkr_score)
     scores.update(params)
     scores = pd.DataFrame(scores, index=[0]).set_index('sub_id').reset_index()
-    scores.to_csv('flkr_map' + subject + '.csv')
+    scores.to_csv('flkr_map_' + subject + '.csv')
