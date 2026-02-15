@@ -197,7 +197,7 @@ def _score_wrapper(sub_id, ddat, conditions, sim_rts, sim_corrects, max_rt=3, fl
     }
     for c in conditions:
         correct = (ddat[c]['resp'] == 0).astype(bool)
-        rts = ddat[c]['ort']
+        rts = ddat[c]['rt']
         nresp = ddat[c]['nresp']
         dat_scores[c], dat_scores[c + '_accscore'], dat_scores[c + '_spdscore'] = flkr_score(correct, rts, nresp)
         dat_scores[c + '_nonresp'] = nresp - len(rts)
