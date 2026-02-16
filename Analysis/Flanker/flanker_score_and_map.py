@@ -81,8 +81,8 @@ def test_FlkrScorer():
     assert np.isclose(ex_score, score)
 
     
-def _load_flkr_data(subject, csv_dir, max_rt=3, log_shift=0.05):
-    s = csv_dir / ('flkr-' + subject + '.csv')
+def _load_flkr_data(subject, s, max_rt=3, log_shift=0.05):
+    #s = csv_dir / ('flkr-' + subject + '.csv')
     
     # load participant data
     dat = pd.read_csv(s)
@@ -197,7 +197,7 @@ def _score_wrapper(sub_id, ddat, conditions, sim_rts, sim_corrects, max_rt=3, fl
     }
     for c in conditions:
         correct = (ddat[c]['resp'] == 0).astype(bool)
-        rts = ddat[c]['rt']
+        rts = ddat[c]['ort']
         nresp = ddat[c]['nresp']
         dat_scores[c], dat_scores[c + '_accscore'], dat_scores[c + '_spdscore'] = flkr_score(correct, rts, nresp)
         dat_scores[c + '_nonresp'] = nresp - len(rts)

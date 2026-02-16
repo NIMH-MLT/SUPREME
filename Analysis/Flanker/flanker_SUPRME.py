@@ -193,6 +193,7 @@ if __name__=="__main__":
     conditions = ['+', '=', '~']
     res = load_results(out_file)
     params = fsm._get_best_params(res, burnin)
+    ddat = fsm._load_flkr_data(subject, s)
     map_res, sim_rts, sim_corrects = fsm._run_map_sims(res, subject, burnin)
     flkr_score = fsm.FlkrScorer(max_rt=1.863647, min_rt=0.528287, include_parts=True)
     scores = fsm._score_wrapper(subject, ddat, conditions + ['total'], sim_rts, sim_corrects, flkr_score=flkr_score)
